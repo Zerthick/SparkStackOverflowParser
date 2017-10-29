@@ -1,0 +1,1 @@
+To clean input file run sed -i '/\/>/ s//><data>data<\/data><\/row>/g' Input.xml

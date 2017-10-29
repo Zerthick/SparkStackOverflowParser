@@ -1,0 +1,18 @@
+*.class
+*.log
+
+## Directory-based project format:
+.idea/
+
+# IntelliJ
+/out/
+*.iml
+/project/
+/target/
+
+# Package Files #
+*.jar
+!gradle-wrapper.jar
+*.war
+*.ear
+*META-INF/
