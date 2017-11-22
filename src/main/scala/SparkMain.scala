@@ -4,6 +4,13 @@ object SparkMain {
 
   def main(args: Array[String]) {
 
+    if (args.length != 2) {
+
+      println("Correct usage: scala SparkMain <input.xml> <output.xml>")
+
+      return
+    }
+
     val spark = SparkSession
       .builder()
       .appName("Word Count XML")
@@ -16,7 +23,7 @@ object SparkMain {
       .format("com.databricks.spark.xml")
       .option("rootTag", "posts")
       .option("rowTag", "row")
-      .load("src/main/resources/Input.xml")
+      .load(args(0))
 
     val cleanedPosts = inputFile.select("_ID", "_Body")
       .map(row => (row.getLong(0) , row.getString(1).toLowerCase.replaceAll("\\s+", " ").replaceAll("(<.*?>|['\"])", "")))
@@ -52,6 +59,10 @@ object SparkMain {
       .withColumnRenamed("_4", "idf")
       .withColumnRenamed("_5", "ictf")
 
-    result.show
+    result.write
+      .format("com.databricks.spark.xml")
+      .option("rootTag", "posts")
+      .option("rowTag", "row")
+      .save(args(1))
   }
 }
