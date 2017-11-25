@@ -370,7 +370,7 @@ grecocd@vcu.edu}}
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 \begin{abstract}
-The abstract goes here.
+The Apache Spark cluster-computing framework has the potential to drastically reduce the runtimes of tasks which are sufficiently parallelizable.  In this paper we present an examination of this capability through the use case of optimizing \sitf, a tool that generates interpretable queries to \so at the developer's behest.  Through our analysis, we observe that we can reduce the runtime of a step of the query generation process in half by leveraging Apache Spark.
 \end{abstract}
 
 % no keywords
@@ -411,7 +411,7 @@ It may happen that when searching for the solution to a development problem the 
 \subsection{Query Generation Procedure} \label{subsec:QueryGen}
 \sitf utilizes a four-step procedure for generating queries illustrated by Figure \ref{fig:overview}. In the first step, a dictionary is constructed offline from the posts contained within the \so Data Dump.  The data dump contains all user posts within the \so site and is published periodically by Stack Exchange. This dictionary is composed of terms extracted from the posts and for each term the \textit{collection term frequency}, \textit{document frequency}, \textit{inverse collection term frequency}, and \textit{inverse document frequency} are stored. Terms are selected from the body of posts based on the following criteria: They must begin with an upper or lowercase letter and they must be at least 2 characters in length. Upon storage in the dictionary, all terms are normalized to be lowercase.
 
-\begin{figure*}[h]
+\begin{figure*}[ht]
 	\centering
 	\caption{Overview of \sitf Query Generation.}
  	\label{fig:overview}
@@ -439,25 +439,51 @@ This approach, while effective, is a prime candidate for parallelization utilizi
 	\item From these metrics, calculate \textit{Inverse Collection Term Frequency} and \textit{Inverse Document Frequency}
 \end{enumerate}
 
-To examine this approach, we compare its runtime to that of the sequential parser for several sub-sets of the \so Data Dump of varying size.  
+To examine this approach, we compare its runtime to that of the sequential parser for several sub-sets of the \so Data Dump of varying size. We ran our experiments on a cluster composed of 56 Intel Xeon E5-2690 CPUs clocked at 2.60GHz.
 
 \section{Results}
+The results of our analysis are given by Table \ref{tab:results}. 
+\begin{table}[ht]
+	\caption{Experimental Results}
+	\label{tab:results}
+	\begin{tabular}{|l|c|c|}
+	\hline
+	Number of Posts & Sequential Runtime (ms) & Spark Runtime (ms) \\
+	\hline
+	10 & \textbf{112} & 4865 \\
+	100 & \textbf{158} & 4935 \\
+	1000 & \textbf{308} & 6918 \\
+	10000 & \textbf{1068} & 13161 \\
+	100000 & \textbf{6587} & 28851 \\
+	1000000 & 64722 & \textbf{44188} \\
+	10000000 & 724983 & \textbf{354799} \\
+	\hline
+	\end{tabular}
+\end{table}
 
+We observe that for small datasets, the sequential parser soundly beats our Spark implementation. However, as the dataset size increases, the Spark implementation begins to overtake the sequential approach.  When examined graphically as in Figure \ref{fig:graph} we see that the sequential approach scales linearly with respect to the number of posts, which is to be expected. However, though the Spark implementation initially experiences a large jump in runtimes, it stables and begins to scale linearly with respect to the number of posts at a much slower rate, overtaking the sequential approach at about 60000 posts.
+
+\begin{figure}[ht]
+	\caption{Indexing Runtime vs Number of Posts}
+	\label{fig:graph}
+	\includegraphics[width=\linewidth]{chart.png}
+\end{figure}
+
+Once more we observe that for our largest dataset of 10000000 posts, the Spark implementation was about slightly more than twice as fast as the sequential parser.  In addition, this dataset represents only a fraction of the total \so Data Dump, meaning the difference in execution times will be even larger when indexing the data dump in its entirety.
 
 \section{Conclusion}
-The conclusion goes here.
+In conclusion, we have examined the application of the Apache Spark framework through the use case of calculating information retrieval metrics on a large corpus of documents, in this case posts from the \so Data Dump.  We have observed that for small datasets, less than about 60000 posts, the runtime of the sequential approach is faster than utilizing Spark.  However, for larger datasets, the runtime can be reduced in half by utilizing Spark over the sequential approach.  This is most likely due to the ability of Spark to distribute and parallelize the task of processing each post.
+	
+The results of this study are promising, as they illustrate the benefits Spark can provide, given a task is sufficiently parallelizable.  However, they also illustrate that for Spark to provide any benefits, the input dataset must be large, such that the overhead of distributing the task to multiple nodes in the cluster is outweighed by the runtime of the sequential implementation.    
 
-
-
+Future research may focus on further optimizing the Spark implementation to reduce runtimes as well as introducing more complex and computationally expensive information retrieval metrics to be calculated while indexing to produce more sophisticated models.
 
 % conference papers do not normally have an appendix
 
 
 % use section* for acknowledgment
 \section*{Acknowledgment}
-
-
-The authors would like to thank...
+The authors would like to thank Dr. Alberto Cano for providing guidance in the development of the Apache Spark implementation and for providing access to the server cluster on which our experiments were run. 
 
 
 
@@ -472,6 +498,9 @@ The authors would like to thank...
 %\IEEEtriggercmd{\enlargethispage{-5in}}
 
 % references section
+
+\bibliographystyle{IEEEtran}
+
 
 % can use a bibliography generated by BibTeX as a .bbl file
 % BibTeX documentation can be easily obtained at:
