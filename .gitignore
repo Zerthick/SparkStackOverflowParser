@@ -7,7 +7,6 @@
 # IntelliJ
 /out/
 *.iml
-/project/
 /target/
 
 # Package Files #
