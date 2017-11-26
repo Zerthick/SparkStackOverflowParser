@@ -422,7 +422,7 @@ In the second step, when a snippet of code is received it is converted into a ba
 
 In the third step, the candidate query is sent to the \so API to retrieval an initial results listing.
 
-In the fourth step the results listing is retrieved as sent for additional processing before displaying it to the user.  If the candidate query returned no results and back-off technique is employed by incrementally removing lower scoring terms from the query.
+In the fourth step the results listing is retrieved as sent for additional processing before displaying it to the user.  If the candidate query returned no results a back-off technique is employed by incrementally removing lower scoring terms from the query.
 
 \section{Apache Spark Parallelization}
 The offline indexing of the \so Data Dump represents a significant commitment of computational resources to achieve, taking several hours to complete.  Though the computation is done offline and their is no direct impact to the user, it must be repeated each time a new data dump is released so that the model does not grow stale over time.  Due to the continued investment of resources necessary re-index future data dumps, efforts to parallelize this approach may be quite useful. Once more, the problem is further compounded by the ever-growing amount of posts contained within \so itself, meaning future data dumps will be even more resource-intensive to process.  In addition, decreasing the indexing run-time may allow for more sophisticated metrics to be computed and thereby enable a more complex recommendation model.
@@ -461,7 +461,7 @@ The results of our analysis are given by Table \ref{tab:results}.
 	\end{tabular}
 \end{table}
 
-We observe that for small datasets, the sequential parser soundly beats our Spark implementation. However, as the dataset size increases, the Spark implementation begins to overtake the sequential approach.  When examined graphically as in Figure \ref{fig:graph} we see that the sequential approach scales linearly with respect to the number of posts, which is to be expected. However, though the Spark implementation initially experiences a large jump in runtimes, it stables and begins to scale linearly with respect to the number of posts at a much slower rate, overtaking the sequential approach at about 60000 posts.
+We observe that for small datasets, the sequential parser soundly beats our Spark implementation. However, as the dataset size increases, the Spark implementation begins to overtake the sequential approach.  When examined graphically as in Figure \ref{fig:graph} we see that the sequential approach scales linearly with respect to the number of posts, which is to be expected. However, though the Spark implementation initially experiences a large jump in runtimes, it stabilizes and begins to scale linearly with respect to the number of posts at a much slower rate, overtaking the sequential approach at about 60000 posts.
 
 \begin{figure}[ht]
 	\caption{Indexing Runtime vs Number of Posts}
